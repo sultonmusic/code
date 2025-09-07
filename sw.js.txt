@@ -1,0 +1,63 @@
+// Service Worker for Soundora Films
+// This service worker caches core assets and downloaded video files to enable offline viewing.
+
+const CORE_CACHE = 'soundora-core-v1';
+const DOWNLOADS_CACHE = 'soundora-downloads';
+
+// List of core assets to cache during installation. Adjust paths as necessary.
+const CORE_ASSETS = [
+  '/',
+  '/films.html',
+  '/index.html',
+  '/styles.css',
+  '/fonts/',
+  // Add other static resources you want to be cached here
+];
+
+self.addEventListener('install', (event) => {
+  // Pre-cache core assets
+  event.waitUntil(
+    caches.open(CORE_CACHE).then((cache) => {
+      return cache.addAll(CORE_ASSETS).catch((err) => {
+        console.error('Error caching core assets:', err);
+      });
+    })
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  // Clean up any old caches
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (![CORE_CACHE, DOWNLOADS_CACHE].includes(key)) {
+            return caches.delete(key);
+          }
+        })
+      );
+    })
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  // For GET requests, try to serve downloaded videos first
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    caches.open(DOWNLOADS_CACHE).then((downloadCache) => {
+      return downloadCache.match(event.request).then((cachedResponse) => {
+        // If request matches a downloaded file, return it
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        // Otherwise try core cache, then network
+        return caches.open(CORE_CACHE).then((coreCache) => {
+          return coreCache.match(event.request).then((coreResponse) => {
+            return coreResponse || fetch(event.request);
+          });
+        });
+      });
+    })
+  );
+});
