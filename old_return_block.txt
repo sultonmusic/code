@@ -1,0 +1,687 @@
+// Final markup with video control panel on the card
+        return `
+            <div>
+                <div class="sticky top-0 z-20 bg-black">
+                    <div class="relative w-full" style="height: 33vh;">
+                        ${cardMedia}
+                        <!-- Back button -->
+                        <button id="back-button" class="absolute top-4 left-4 bg-black/50 w-10 h-10 rounded-full text-white flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
+                        <!-- Favorite button -->
+                        <button id="fav-button" class="fav-button absolute top-4 right-16 bg-black/50 w-10 h-10 rounded-full text-white ${isFavorited ? 'favorited' : ''}" data-movie-id="${movie.id}">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <!-- Settings button -->
+                        <button id="card-settings-button" class="absolute top-4 right-4 bg-black/50 w-10 h-10 rounded-full text-white flex items-center justify-center"><i class="fas fa-cog"></i></button>
+                        <!-- Central play/pause overlay (hidden by default) -->
+                        <div id="card-center-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none hidden">
+                            <button id="card-play-pause-button" class="text-white text-5xl flex items-center justify-center pointer-events-auto"><i class="fas fa-play"></i></button>
+                            <!-- Speed indicator shown during hold -->
+                            <div id="card-speed-indicator" class="absolute top-1/3 inset-x-0 text-center text-4xl font-bold text-white opacity-0">2x</div>
+                        </div>
+                        <!-- Bottom controls: progress bar and fullscreen, hidden by default -->
+                        <div id="card-bottom-controls" class="absolute inset-0 flex flex-col justify-end pointer-events-none hidden">
+                            <div class="w-full bg-black/50 p-2 pointer-events-auto">
+                                <div class="flex items-center">
+                                    <span id="card-current-time" class="text-xs text-white">00:00</span>
+                                    <input id="card-progress" type="range" min="0" max="0" value="0" class="flex-grow mx-2 h-1 cursor-pointer appearance-none rounded-lg bg-gray-400">
+                                    <span id="card-duration" class="text-xs text-white">00:00</span>
+                                    <button id="card-fullscreen-button" data-movie-id="${movie.id}" class="ml-2 text-white text-lg"><i class="fas fa-expand"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Settings menu overlay (hidden by default). Centered and narrower like YouTube's modal -->
+                        <div id="card-settings-menu" class="absolute left-1/2 -translate-x-1/2 bottom-0 mb-[50px] w-11/12 max-w-sm px-4 py-3 bg-black/90 text-white rounded-t-lg hidden">
+                            <div class="text-lg font-bold mb-2" data-lang-key="settings">РќР°СЃС‚СЂРѕР№РєРё</div>
+                            <div id="card-settings-quality-row" class="flex justify-between items-center py-2 border-b border-gray-700">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-tv text-gray-400"></i>
+                                    <span data-lang-key="quality">РљР°С‡РµСЃС‚РІРѕ</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="card-settings-quality">720p</span>
+                                    <i class="fas fa-chevron-right text-gray-500"></i>
+                                </div>
+                            </div>
+                            <div id="card-settings-speed-row" class="flex justify-between items-center py-2 border-b border-gray-700">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-stopwatch text-gray-400"></i>
+                                    <span data-lang-key="playbackSpeed">РЎРєРѕСЂРѕСЃС‚СЊ РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="card-settings-speed" data-lang-key="normalSpeed">РћР±С‹С‡РЅР°СЏ</span>
+                                    <i class="fas fa-chevron-right text-gray-500"></i>
+                                </div>
+                            </div>
+                            <div id="card-settings-subtitles-row" class="flex justify-between items-center py-2 border-b border-gray-700">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-closed-captioning text-gray-400"></i>
+                                    <span data-lang-key="subtitles">РЎСѓР±С‚РёС‚СЂС‹</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="card-settings-subtitles" data-lang-key="noSubtitles">Р’С‹РєР».</span>
+                                    <i class="fas fa-chevron-right text-gray-500"></i>
+                                </div>
+                            </div>
+                            <!-- Screen Lock row -->
+                            <div id="card-settings-screenlock-row" class="flex justify-between items-center py-2 border-b border-gray-700">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-lock text-gray-400"></i>
+                                    <span data-lang-key="screenLock">Р‘Р»РѕРєРёСЂРѕРІРєР° СЌРєСЂР°РЅР°</span>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-500"></i>
+                            </div>
+                            <!-- More row -->
+                            <div id="card-settings-more-row" class="flex justify-between items-center py-2">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-ellipsis-h text-gray-400"></i>
+                                    <span data-lang-key="more">Р•С‰С‘</span>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container mx-auto p-4">
+                    <h1 class="text-2xl md:text-3xl font-bold leading-tight mb-1">${movie.title || ''}</h1>
+                    <p class="text-gray-400 text-sm mb-3">${movie.originalTitle || ''}</p>
+                    <div class="flex flex-wrap items-center gap-2 mb-4">${premiumTag}${qualityTags}</div>
+                    ${infoGrid}
+                    <div class="flex flex-wrap gap-2 my-4">
+                        <button id="download-button" class="w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center gap-2" data-movie-id="${movie.id}">
+                            <i class="fas fa-download"></i>
+                            <span data-lang-key="downloadButton">Download</span>
+                        </button>
+                        <button id="cast-button" class="w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center gap-2">
+                            <i class="fas fa-tv"></i>
+                            <span class="sr-only">Cast</span>
+                        </button>
+                        <!-- Removed ticket purchase button. Previously, this button navigated to the kassa page with the movie title as a query parameter. -->
+                        <!-- The button has been omitted as per request. -->
+                    </div>
+                    <div class="mt-6">
+                        ${seriesControls}
+                        ${infoTabs}
+                        ${infoContents}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderFavoritesPage() {
+        const favoriteMovies = movies.filter(m => currentUser?.favorites?.includes(m.id));
+        const content = favoriteMovies.length > 0 ? favoriteMovies.map(createMovieCardHTML).join('') : `<p class="col-span-full text-center text-gray-400 mt-8" data-lang-key="noFavorites"></p>`;
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <h1 class="text-2xl md:text-4xl font-bold mb-6 border-l-4 border-red-500 pl-4" data-lang-key="favorites"></h1>
+                <div id="favorites-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">${content}</div>
+            </div>`;
+    }
+
+    // Render page showing downloaded (offline) movies
+    function renderDownloadsPage() {
+        // Retrieve list of downloaded movie objects (or IDs for backward compatibility)
+        let downloadedRaw;
+        try {
+            downloadedRaw = JSON.parse(localStorage.getItem('soundora-downloads')) || [];
+        } catch (e) {
+            downloadedRaw = [];
+        }
+        // Normalize to list of strings (IDs)
+        const ids = downloadedRaw.map(item => (typeof item === 'object' ? String(item.id) : String(item)));
+        const uniqueIds = Array.from(new Set(ids));
+        // Use a safe check in case movies data has not loaded yet
+        const downloadedMovies = Array.isArray(movies)
+            ? movies.filter(m => uniqueIds.includes(String(m.id)))
+            : [];
+        const content = downloadedMovies.length > 0
+            ? downloadedMovies.map(movie => {
+                // Find corresponding download entry
+                const dEntry = downloadedRaw.find(item => (typeof item === 'object' && String(item.id) === String(movie.id)));
+                let progressHTML = '';
+                if (dEntry && dEntry.status === 'downloading') {
+                    const prog = dEntry.progress || 0;
+                    progressHTML = `<div class="p-2"><div class="w-full bg-gray-600 rounded h-2"><div id="download-progress-${movie.id}" class="bg-red-500 h-2 rounded" style="width:${prog}%"></div></div><div id="download-progress-text-${movie.id}" class="text-xs text-gray-400 mt-1">${Math.round(prog)}%</div></div>`;
+                } else if (dEntry && dEntry.status === 'completed') {
+                    progressHTML = `<div class="p-2 text-green-400 text-xs" data-lang-key="downloadCompleted">Downloaded</div>`;
+                }
+                return `<div class="relative">${createMovieCardHTML(movie)}${progressHTML}</div>`;
+            }).join('')
+            : `<p class="col-span-full text-center text-gray-400 mt-8" data-lang-key="noDownloads"></p>`;
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <h1 class="text-2xl md:text-4xl font-bold mb-6 border-l-4 border-red-500 pl-4" data-lang-key="downloads"></h1>
+                <div id="downloads-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">${content}</div>
+            </div>`;
+    }
+
+    function renderProfilePage() {
+        if (!currentUser) return '';
+        return `
+            <div class="container mx-auto px-4 py-6 flex flex-col" style="min-height: calc(100vh - 8rem);">
+                <div class="flex-grow">
+                    <div class="flex justify-between items-center mb-8">
+                        <h1 class="text-2xl md:text-4xl font-bold border-l-4 border-red-500 pl-4" data-lang-key="profile"></h1>
+                        <div class="flex items-center gap-4">
+                            <!-- Replace robot icon with chat icon for AI/chat button -->
+                            <button id="profile-ai-chat-btn" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fas fa-comments text-2xl"></i></button>
+                            <button id="switch-account-btn" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fas fa-user-friends text-2xl"></i></button>
+                        </div>
+                    </div>
+                        <div class="flex flex-row items-center gap-4 md:gap-8">
+                        <div class="flex-shrink-0 relative">
+                            <img src="${currentUser.photoURL || `https://placehold.co/150x150/ef4444/ffffff?text=${currentUser.displayName?.charAt(0) || 'U'}`}" alt="User Avatar" class="w-24 h-24 md:w-36 md:h-36 rounded-full border-4 border-gray-700 shadow-lg">
+                            ${currentUser.isPremium
+                                ? '<div class="absolute -top-3 md:-top-4 left-1/2 transform -translate-x-1/2"><i class="fas fa-crown text-yellow-400 text-2xl md:text-3xl"></i></div>'
+                                : '<div class="absolute bottom-0 right-0 bg-gray-700 rounded-full p-1"><i class="fas fa-user text-xs text-white"></i></div>'}
+                        </div>
+                        <div class="text-left">
+                            <h2 class="text-2xl md:text-3xl font-bold">${currentUser.displayName || 'User'}</h2>
+                            <p class="text-gray-400 mt-1 md:mt-2">${currentUser.email || currentUser.phoneNumber || ''}</p>
+                            <div class="mt-2">
+                                <div class="flex items-center gap-2">
+                                    <button id="copy-id-btn" class="bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 text-sm py-1 px-3 rounded-md transition-colors flex items-center gap-2">
+                                        ID: <span id="user-profile-id" class="truncate max-w-[150px]">${currentUser.customId || currentUser.uid}</span>
+                                    </button>
+                                    ${currentUser.isPremium ? '<div class="flex-shrink-0 bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full p-1"><i class="fas fa-crown text-xs text-black"></i></div>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-10 space-y-4">
+                         <button id="settings-btn" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                            <span><i class="fas fa-cog w-6 text-center mr-3"></i><span data-lang-key="settings"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                            </button>
+                         <button id="premium-btn" class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 text-white font-semibold py-4 px-5 rounded-lg transition-transform hover:scale-105 flex justify-between items-center text-left shadow-lg">
+                            <span><i class="fas fa-crown w-6 text-center mr-3"></i><span data-lang-key="premium"></span></span><i class="fas fa-chevron-right text-gray-200"></i>
+                            </button>
+                         <button id="privacy-policy-btn" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                            <span><i class="fas fa-shield-alt w-6 text-center mr-3"></i><span data-lang-key="privacyPolicy"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                            </button>
+                         <button id="faq-btn" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                            <span><i class="fas fa-question-circle w-6 text-center mr-3"></i><span data-lang-key="faq"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                            </button>
+                         <!-- Downloads button for offline movies -->
+                         <button id="downloads-btn" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                            <span><i class="fas fa-download w-6 text-center mr-3"></i><span data-lang-key="downloads"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                         </button>
+                        ${currentUser?.role === 'admin' ? `
+                            <a id="ap-control-btn" href="./admin.html" target="_blank" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                                <span><i class="fas fa-tools w-6 text-center mr-3"></i><span data-lang-key="apControl"></span></span><i class="fas fa-external-link-alt text-gray-500"></i>
+                            </a>
+                        ` : ''}
+                    </div>
+                    <!-- Account Switch and Logout at bottom -->
+                    <div class="mt-8 space-y-4">
+                        <button id="switch-account-btn-bottom" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                            <span><i class="fas fa-user-friends w-6 text-center mr-3"></i><span data-lang-key="switchAccount"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                        </button>
+                        <button id="logout-btn-bottom" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-red-500 font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                            <span><i class="fas fa-sign-out-alt w-6 text-center mr-3"></i><span data-lang-key="logout"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-center text-gray-500 text-xs mt-8 flex-shrink-0"><span data-lang-key="appVersion"></span>: ${APP_VERSION}</p>
+            </div>`;
+    }
+
+    function renderGuestProfilePage() {
+        return `
+            <div class="container mx-auto px-4 py-6 flex flex-col" style="min-height: calc(100vh - 8rem);">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-2xl md:text-4xl font-bold border-l-4 border-red-500 pl-4" data-lang-key="profile"></h1>
+                    <div class="flex items-center gap-4">
+                       <!-- Replace robot icon with chat icon for AI/chat button -->
+                       <button id="guest-ai-chat-btn" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fas fa-comments text-2xl"></i></button>
+                    </div>
+                </div>
+                <div class="flex-grow flex flex-col items-center justify-center text-center">
+                    <i class="fas fa-user-circle text-6xl text-gray-600 mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2" data-lang-key="loginRequired"></h2>
+                    <p class="text-gray-400 mb-6 max-w-sm" data-lang-key="loginToAccess"></p>
+                    <button id="guest-login-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+                        <span data-lang-key="login"></span>
+                    </button>
+                </div>
+                 <p class="text-center text-gray-500 text-xs mt-8 flex-shrink-0"><span data-lang-key="appVersion"></span>: ${APP_VERSION}</p>
+            </div>
+        `;
+    }
+
+    function renderLoginPage() {
+        return `
+            <div class="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[calc(100vh-8rem)]">
+                <div class="w-full max-w-md">
+                    <h1 class="text-3xl font-bold text-center mb-6" data-lang-key="loginTitle"></h1>
+
+                    <!-- Tablar -->
+                    <div class="flex justify-center border-b border-gray-700 mb-6">
+                        <button id="email-login-tab" class="auth-tab w-1/2 py-3 font-semibold text-gray-400 active" data-lang-key="loginWithEmail"></button>
+                        <button id="phone-login-tab" class="auth-tab w-1/2 py-3 font-semibold text-gray-400" data-lang-key="loginWithPhone"></button>
+                    </div>
+
+                    <!-- Email orqali kirish formasi -->
+                    <div id="email-login-form-container">
+                         <form id="login-form">
+                            <div class="space-y-4">
+                                <input type="email" id="login-email-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 focus:border-red-500 focus:ring-red-500 transition" data-lang-key="loginLabel" placeholder="Login (Email)" required>
+                                <input type="password" id="login-password-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 focus:border-red-500 focus:ring-red-500 transition" data-lang-key="password" placeholder="Parol" required>
+                            </div>
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors mt-6">
+                                <span data-lang-key="login"></span>
+                            </button>
+                         </form>
+                    </div>
+
+                    <!-- Telefon raqami orqali kirish formasi -->
+                    <div id="phone-login-form-container" class="hidden">
+                        <div id="login-phone-entry-view">
+                            <div class="space-y-4">
+                               <label for="phone" class="block text-sm font-medium text-gray-400 mb-1" data-lang-key="phoneNumber"></label>
+                               <div class="flex items-center border border-gray-700 rounded-lg focus-within:ring-1 focus-within:ring-red-500 focus-within:border-red-500 transition duration-200 bg-gray-800/50">
+                                    <div class="relative">
+                                        <select id="login-country-code" class="pl-3 pr-8 py-3 bg-transparent appearance-none cursor-pointer focus:outline-none text-gray-300">
+                                            <!-- Davlatlar ro'yxati JavaScript orqali qo'shiladi -->
+                                        </select>
+                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                            <i class="fas fa-chevron-down text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <input type="tel" id="phone-number-input" class="w-full p-3 border-none bg-transparent focus:ring-0 text-white" placeholder="901234567" required>
+                                </div>
+                            </div>
+                            <button id="send-code-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors mt-6">
+                                <span data-lang-key="sendCode"></span>
+                            </button>
+                        </div>
+                        <div id="login-code-entry-view" class="hidden">
+                             <div class="space-y-4">
+                                <input type="text" id="verification-code-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-center tracking-[1em]" data-lang-key="verificationCode" placeholder="______" required maxlength="6">
+                            </div>
+                            <button id="verify-code-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors mt-6">
+                                <span data-lang-key="verify"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <p id="login-error" class="text-red-500 text-center text-sm h-4 mt-4"></p>
+
+                    <div class="text-center text-sm text-gray-400 mt-6">
+                        <span data-lang-key="dontHaveAccount"></span>
+                        <button id="go-to-register-btn" class="font-semibold text-red-500 hover:text-red-400" data-lang-key="registerNow"></button>
+                    </div>
+
+                    <!-- reCAPTCHA uchun konteyner -->
+                    <div id="recaptcha-container" class="flex justify-center mt-4"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderRegisterPage() {
+        return `
+            <div class="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[calc(100vh-8rem)]">
+                <div class="w-full max-w-md">
+                    <h1 class="text-3xl font-bold text-center mb-6" data-lang-key="registerTitle"></h1>
+
+                    <!-- Tablar -->
+                    <div class="flex justify-center border-b border-gray-700 mb-6">
+                        <button id="email-register-tab" class="auth-tab w-1/2 py-3 font-semibold text-gray-400 active" data-lang-key="loginWithEmail"></button>
+                        <button id="phone-register-tab" class="auth-tab w-1/2 py-3 font-semibold text-gray-400" data-lang-key="registerWithPhone"></button>
+                    </div>
+
+                    <!-- Email orqali ro'yxatdan o'tish -->
+                    <div id="email-register-form-container">
+                        <div class="bg-yellow-900/30 border border-yellow-700 text-yellow-300 px-4 py-3 rounded-lg relative mb-6" role="alert">
+                          <strong class="font-bold" data-lang-key="registerWarningTitle"></strong>
+                          <span class="block sm:inline" data-lang-key="registerWarningText"></span>
+                        </div>
+                        <form id="register-form">
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="register-name-input" class="block text-sm font-medium text-gray-400 mb-1" data-lang-key="fullName"></label>
+                                    <input type="text" id="register-name-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 focus:border-red-500 focus:ring-red-500 transition" required>
+                                </div>
+                                <div>
+                                    <label for="register-email-input" class="block text-sm font-medium text-gray-400 mb-1" data-lang-key="loginLabel"></label>
+                                    <input type="email" id="register-email-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 focus:border-red-500 focus:ring-red-500 transition" required>
+                                </div>
+                                 <div>
+                                    <label for="register-password-input" class="block text-sm font-medium text-gray-400 mb-1" data-lang-key="password"></label>
+                                    <input type="password" id="register-password-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 focus:border-red-500 focus:ring-red-500 transition" required>
+                                </div>
+                                 <div>
+                                    <label for="register-dob-input" class="block text-sm font-medium text-gray-400 mb-1" data-lang-key="dobLabel"></label>
+                                    <input type="date" id="register-dob-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 focus:border-red-500 focus:ring-red-500 transition" required>
+                                </div>
+                                 <div>
+                                    <label for="register-secret-input" class="block text-sm font-medium text-gray-400 mb-1" data-lang-key="secretWordLabel"></label>
+                                    <input type="text" id="register-secret-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 focus:border-red-500 focus:ring-red-500 transition" data-lang-key="secretWordPlaceholder" required>
+                                </div>
+                                <p id="register-error" class="text-red-500 text-center text-sm h-4"></p>
+                            </div>
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors mt-6">
+                                <span data-lang-key="registerTitle"></span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Telefon orqali ro'yxatdan o'tish -->
+                    <div id="phone-register-form-container" class="hidden">
+                        <div id="register-phone-entry-view">
+                            <div class="space-y-4">
+                               <label for="phone" class="block text-sm font-medium text-gray-400 mb-1" data-lang-key="phoneNumber"></label>
+                               <div class="flex items-center border border-gray-700 rounded-lg focus-within:ring-1 focus-within:ring-red-500 focus-within:border-red-500 transition duration-200 bg-gray-800/50">
+                                    <div class="relative">
+                                        <select id="register-country-code" class="pl-3 pr-8 py-3 bg-transparent appearance-none cursor-pointer focus:outline-none text-gray-300">
+                                            <!-- Davlatlar ro'yxati JavaScript orqali qo'shiladi -->
+                                        </select>
+                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                            <i class="fas fa-chevron-down text-xs"></i>
+                                        </div>
+                                    </div>
+                                    <input type="tel" id="register-phone-number-input" class="w-full p-3 border-none bg-transparent focus:ring-0 text-white" placeholder="901234567" required>
+                                </div>
+                            </div>
+                            <button id="register-send-code-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors mt-6">
+                                <span data-lang-key="sendCode"></span>
+                            </button>
+                        </div>
+                        <div id="register-code-entry-view" class="hidden">
+                             <div class="space-y-4">
+                                <input type="text" id="register-verification-code-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-center tracking-[1em]" data-lang-key="verificationCode" placeholder="______" required maxlength="6">
+                            </div>
+                            <button id="register-verify-code-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors mt-6">
+                                <span data-lang-key="verify"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <p id="register-page-error" class="text-red-500 text-center text-sm h-4 mt-4"></p>
+
+                    <p class="text-center text-sm text-gray-400 mt-6">
+                        <span data-lang-key="alreadyHaveAccount"></span>
+                        <button id="go-to-login-btn" class="font-semibold text-red-500 hover:text-red-400" data-lang-key="loginNow"></button>
+                    </p>
+
+                    <div id="register-recaptcha-container" class="flex justify-center mt-4"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderSettingsPage() {
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center mb-8">
+                    <button id="back-button" class="text-2xl mr-4"><i class="fas fa-arrow-left"></i></button>
+                    <h1 class="text-2xl md:text-4xl font-bold" data-lang-key="settings"></h1>
+                </div>
+                <div class="space-y-4">
+                    <button id="edit-profile-btn" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                        <span><i class="fas fa-user-edit w-6 text-center mr-3"></i><span data-lang-key="editProfile"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                    </button>
+                    <button id="language-settings-btn" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                        <span><i class="fas fa-language w-6 text-center mr-3"></i><span data-lang-key="language"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                    </button>
+                    <button id="playback-settings-btn" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                        <span><i class="fas fa-play-circle w-6 text-center mr-3"></i><span data-lang-key="playback"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                    </button>
+                    <button id="content-settings-btn" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                        <span><i class="fas fa-eye w-6 text-center mr-3"></i><span data-lang-key="content"></span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                    </button>
+                    <!-- Region settings button: allows users to change payment region -->
+                    <button id="region-settings-btn" class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-semibold py-4 px-5 rounded-lg transition-colors flex justify-between items-center text-left">
+                        <span><i class="fas fa-globe w-6 text-center mr-3"></i><span>Region</span></span><i class="fas fa-chevron-right text-gray-500"></i>
+                    </button>
+                </div>
+            </div>`;
+    }
+
+    function renderPrivacyPolicyPage() {
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center mb-8">
+                    <button id="back-button" class="text-2xl mr-4"><i class="fas fa-arrow-left"></i></button>
+                    <h1 class="text-2xl md:text-4xl font-bold" data-lang-key="privacyTitle"></h1>
+                </div>
+                <p class="text-sm text-gray-500 mb-4" data-lang-key="privacyLastUpdated"></p>
+                <div class="space-y-6 text-gray-300 leading-relaxed">
+                    <div>
+                        <h2 class="text-xl font-bold" data-lang-key="privacy1Title"></h2>
+                        <p data-lang-key="privacy1Text"></p>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold" data-lang-key="privacy2Title"></h2>
+                        <p data-lang-key="privacy2Text"></p>
+                    </div>
+                    <div>
+                         <h2 class="text-xl font-bold" data-lang-key="privacy3Title"></h2>
+                        <p data-lang-key="privacy3Text"></p>
+                    </div>
+                    <div>
+                         <h2 class="text-xl font-bold" data-lang-key="privacy4Title"></h2>
+                        <p data-lang-key="privacy4Text"></p>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    function renderFaqPage() {
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center mb-8">
+                    <button id="back-button" class="text-2xl mr-4"><i class="fas fa-arrow-left"></i></button>
+                    <h1 class="text-2xl md:text-4xl font-bold" data-lang-key="faqTitle"></h1>
+                </div>
+                <div class="space-y-6 text-gray-300">
+                    <div>
+                        <h2 class="text-xl font-bold mb-2" data-lang-key="faq1Title"></h2>
+                        <p data-lang-key="faq1Answer"></p>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold mb-2" data-lang-key="faq2Title"></h2>
+                        <p data-lang-key="faq2Answer"></p>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold mb-2" data-lang-key="faq3Title"></h2>
+                        <p data-lang-key="faq3Answer"></p>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    function renderPlaybackSettingsPage() {
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center mb-8">
+                    <button id="back-button" class="text-2xl mr-4"><i class="fas fa-arrow-left"></i></button>
+                    <h1 class="text-2xl md:text-4xl font-bold" data-lang-key="playback"></h1>
+                </div>
+                <div class="bg-gray-800/50 rounded-lg p-5">
+                    <!-- Mini player toggle -->
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <label for="mini-player-toggle" class="text-white font-semibold" data-lang-key="enableMiniPlayer"></label>
+                            <p class="text-gray-400 text-sm mt-1" data-lang-key="miniPlayerHint"></p>
+                        </div>
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="mini-player-toggle" id="mini-player-toggle" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 appearance-none cursor-pointer" ${isMiniPlayerEnabled ? 'checked' : ''}/>
+                            <label for="mini-player-toggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-600 cursor-pointer"></label>
+                        </div>
+                    </div>
+                    <!-- Resume prompt toggle -->
+                    <div class="flex justify-between items-center mt-4">
+                        <div>
+                            <label for="resume-prompt-toggle" class="text-white font-semibold" data-lang-key="enableResumePrompt"></label>
+                            <p class="text-gray-400 text-sm mt-1" data-lang-key="resumePromptHint"></p>
+                        </div>
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="resume-prompt-toggle" id="resume-prompt-toggle" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 appearance-none cursor-pointer" ${isResumePromptEnabled ? 'checked' : ''}/>
+                            <label for="resume-prompt-toggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-600 cursor-pointer"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    function renderEditProfilePage() {
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center mb-8">
+                    <button id="back-button" class="text-2xl mr-4"><i class="fas fa-arrow-left"></i></button>
+                    <h1 class="text-2xl md:text-4xl font-bold" data-lang-key="editProfile"></h1>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label for="username-input" class="block text-sm font-medium text-gray-400 mb-2" data-lang-key="name"></label>
+                        <input type="text" id="username-input" value="${currentUser?.displayName || ''}" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3 focus:border-red-500 focus:ring-red-500 transition">
+                    </div>
+                    <div>
+                        <label for="email-input-display" class="block text-sm font-medium text-gray-400 mb-2" data-lang-key="email"></label>
+                        <input type="email" id="email-input-display" value="${currentUser?.email || ''}" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3" disabled>
+                    </div>
+                    <button id="save-profile-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                        <span data-lang-key="save"></span>
+                    </button>
+                </div>
+
+                ${currentUser?.email ? `
+                <div class="mt-8 pt-6 border-t border-gray-600">
+                     <h2 class="text-xl font-bold mb-4" data-lang-key="changePassword"></h2>
+                     <form id="change-password-form" class="space-y-4">
+                        <input type="password" id="current-password-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3" data-lang-key="password" placeholder="Joriy parol" required>
+                        <input type="password" id="new-password-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3" data-lang-key="newPassword" placeholder="Yangi parol" required>
+                        <input type="password" id="confirm-password-input" class="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-3" data-lang-key="confirmPassword" placeholder="Yangi parolni tasdiqlang" required>
+                        <p id="password-error" class="text-red-500 text-sm h-4"></p>
+                        <button type="submit" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                            <span data-lang-key="changePassword"></span>
+                        </button>
+                     </form>
+                </div>` : ''}
+            </div>`;
+    }
+
+    function renderLanguageSettingsPage() {
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center mb-8">
+                    <button id="back-button" class="text-2xl mr-4"><i class="fas fa-arrow-left"></i></button>
+                    <h1 class="text-2xl md:text-4xl font-bold" data-lang-key="languageSettingTitle"></h1>
+                </div>
+                <div class="flex flex-col space-y-3">
+                    <button class="lang-btn text-left w-full p-4 rounded-md bg-gray-800/50 hover:bg-gray-700/50 transition-colors" data-lang="ru">Р СѓСЃСЃРєРёР№</button>
+                    <button class="lang-btn text-left w-full p-4 rounded-md bg-gray-800/50 hover:bg-gray-700/50 transition-colors" data-lang="en">English</button>
+                    <button class="lang-btn text-left w-full p-4 rounded-md bg-gray-800/50 hover:bg-gray-700/50 transition-colors" data-lang="uz">O'zbekcha</button>
+                </div>
+            </div>`;
+    }
+
+    function renderContentSettingsPage() {
+        const show18Plus = JSON.parse(localStorage.getItem('soundora-show18plus')) || false;
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center mb-8">
+                    <button id="back-button" class="text-2xl mr-4"><i class="fas fa-arrow-left"></i></button>
+                    <h1 class="text-2xl md:text-4xl font-bold" data-lang-key="contentSettingsTitle"></h1>
+                </div>
+                <div class="bg-gray-800/50 rounded-lg p-5 flex justify-between items-center">
+                    <label for="content-toggle" class="text-white font-semibold" data-lang-key="show18Plus"></label>
+                    <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="content-toggle" id="content-toggle" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 appearance-none cursor-pointer" ${show18Plus ? 'checked' : ''}/>
+                        <label for="content-toggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-600 cursor-pointer"></label>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    function renderPremiumPage() {
+        const plans = [
+            { months: 1, pricePerMonth: 199, tagKey: null },
+            { months: 3, pricePerMonth: 169, tagKey: 'mostPopular' },
+            { months: 7, pricePerMonth: 149, tagKey: null },
+            { months: 12, pricePerMonth: 129, tagKey: 'bestValue' }
+        ];
+
+        // Build the markup for each plan.  A purchase button has been added so that
+        // users can proceed to the ticketвЂ‘purchase page.  The button simply
+        // navigates to kassa.html when clicked.  Each card is a flex container
+        // to push the button to the bottom of the card for consistent spacing.
+        const plansHTML = plans.map(plan => `
+            <div class="bg-gray-700/50 rounded-lg p-4 relative flex flex-col justify-between">
+                ${plan.tagKey ? `<div class="absolute top-0 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full" data-lang-key="${plan.tagKey}"></div>` : ''}
+                <div>
+                    <h3 class="text-xl font-bold" data-lang-key="plan${plan.months}Months"></h3>
+                    <p class="text-3xl font-black my-2">${plan.pricePerMonth} в‚Ѕ<span class="text-base font-normal text-gray-400" data-lang-key="pricePerMonth"></span></p>
+                    <p class="text-sm text-gray-400"><span data-lang-key="total"></span>: ${plan.months * plan.pricePerMonth} в‚Ѕ</p>
+                </div>
+                <button class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors" onclick="openKassa(${plan.months}, ${plan.months * plan.pricePerMonth}); return false;">
+                    Sotib olish
+                </button>
+            </div>
+        `).join('');
+
+        // Build current subscription status card
+        const isPremiumUser = currentUser?.isPremium;
+        let statusHTML = '';
+        if (isPremiumUser) {
+            let expiresDate;
+            const expiresData = currentUser?.premiumExpiresAt;
+            try {
+                if (expiresData && typeof expiresData.toDate === 'function') {
+                    expiresDate = expiresData.toDate();
+                } else if (expiresData?.seconds) {
+                    expiresDate = new Date(expiresData.seconds * 1000);
+                } else if (expiresData) {
+                    expiresDate = new Date(expiresData);
+                }
+            } catch (err) {
+                expiresDate = null;
+            }
+            let daysLeft = '';
+            let expStr = '';
+            if (expiresDate) {
+                const diffMs = expiresDate.getTime() - Date.now();
+                const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                if (!isNaN(diffDays)) {
+                    daysLeft = diffDays > 0 ? diffDays : 0;
+                }
+                expStr = expiresDate.toLocaleDateString();
+            }
+            const expLabel = translations[currentLanguage]?.expiresOn || 'Expires on';
+            const daysLabel = translations[currentLanguage]?.daysLeft || 'days left';
+            statusHTML = `<h2 class="text-2xl font-bold mb-2">${translations[currentLanguage]?.premium || 'Premium'}</h2><p class="text-gray-400">${expLabel}: ${expStr}${daysLeft !== '' ? ' (' + daysLeft + ' ' + daysLabel + ')' : ''}</p>`;
+        } else {
+            statusHTML = `<h2 class="text-2xl font-bold mb-2" data-lang-key="getPremium"></h2><p class="text-gray-400" data-lang-key="premiumHint"></p>`;
+        }
+        return `
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center mb-8">
+                    <button id="back-button" class="text-2xl mr-4"><i class="fas fa-arrow-left"></i></button>
+                    <h1 class="text-2xl md:text-4xl font-bold" data-lang-key="premium"></h1>
+                </div>
+                <!-- Promo code and status section -->
+                <div class="md:flex md:gap-4 mb-8">
+                    <!-- Promo code input -->
+                    <div class="md:w-1/2 order-2 md:order-1 mb-6 md:mb-0">
+                        <div class="bg-gray-800/50 rounded-lg p-6">
+                            <h3 class="text-lg font-bold mb-2" data-lang-key="promoCode"></h3>
+                            <input id="promo-code-input" type="text" class="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-red-500" placeholder="${translations[currentLanguage]?.enterPromoCode || 'Enter promo code'}">
+                            <button id="redeem-promo-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors mt-4" data-lang-key="activatePromo"></button>
+                            <p id="promo-feedback" class="text-sm mt-2"></p>
+                        </div>
+                    </div>
+                    <!-- Status and hero -->
+                    <div class="md:w-1/2 order-1 md:order-2">
+                        <div class="bg-gray-800/50 rounded-lg p-6 text-center">
+                            <i class="fas fa-crown text-5xl text-yellow-400 mb-4"></i>
+                            ${statusHTML}
+                        </div>
+                    </div>
+                </div>
+                <!-- Plans and subscription steps (only for free users) -->
+                ${!isPremiumUser ? `<div class="grid grid-cols-2 gap-4 mb-8">${plansHTML}</div><div class="bg-gray-800/50 rounded-lg p-6"><h3 class="text-lg font-bold mb-4" data-lang-key="howToSubscribe"></h3><ol class="list-decimal list-inside space-y-2 text-gray-300"><li data-lang-key="subscribeStep1"></li><li data-lang-key="subscribeStep2"></li><li data-lang-key="subscribeStep3"></li></ol></div>` : ''}
+            </div>`;
+    }
+
