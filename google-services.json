@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "92363153683",
+    "project_id": "soundora-music",
+    "storage_bucket": "soundora-music.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92363153683:android:c42dc6e14eaec327a97ae6",
+        "android_client_info": {
+          "package_name": "com.example.soundoratv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "92363153683-rq7h92a0lbh5d3q11us7jmvkgtivocoa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.soundoratv",
+            "certificate_hash": "2557f87c129914593dccd555c5fdb93aabc80aaa"
+          }
+        },
+        {
+          "client_id": "92363153683-dqshp22j82kpose7umv73bd5ju9485ri.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAszokm_jK67P6wnjZOuh1StXX1oFs6p_4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "92363153683-dqshp22j82kpose7umv73bd5ju9485ri.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

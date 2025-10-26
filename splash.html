@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SND Kinematik Intro — Kamera Effekt (Tugash qora fon bilan)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-color: #000;
+      font-family: 'Montserrat', sans-serif;
+      overflow: hidden;
+    }.scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: transform 3s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+}
+
+.letter {
+  font-size: 15vw;
+  font-weight: 700;
+  transition: all 1.5s ease-in-out;
+}
+
+.s { color: #ffffff; text-shadow: 0 0 5px #fff; }
+.d { color: #ff0000; text-shadow: 0 0 10px #ff0000; }
+.n { color: #ffffff; }
+
+.s.animate { animation: moveS 2.2s forwards ease-in-out; }
+@keyframes moveS { to { transform: translateX(-350%) scale(0.8); opacity: 0; } }
+
+.d.animate { animation: moveD 2.2s forwards ease-in-out; }
+@keyframes moveD { to { transform: translateX(350%) scale(0.8); opacity: 0; } }
+
+.n.animate {
+  animation: zoomN 3.5s forwards ease-in-out 0.8s;
+  transform-origin: center center;
+}
+
+@keyframes zoomN {
+  0% { transform: scale(1); color: #ffffff; }
+  40% { transform: scale(3); color: #ff0000; text-shadow: 0 0 25px #ff0000; }
+  80% { transform: scale(8); color: #a00000; background-color: transparent; }
+  100% { transform: scale(20); color: #000; background-color: #000; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="logo-container">
+      <span class="letter s">S</span>
+      <span class="letter n">N</span>
+      <span class="letter d">D</span>
+    </div>
+  </div>  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const s = document.querySelector('.s');
+      const n = document.querySelector('.n');
+      const d = document.querySelector('.d');
+
+      setTimeout(() => {
+        s.classList.add('animate');
+        d.classList.add('animate');
+        n.classList.add('animate');
+      }, 800);
+
+      n.addEventListener('animationend', (e) => {
+        if (e.animationName === 'zoomN') {
+          document.body.style.backgroundColor = '#000';
+          if (window.Android && typeof window.Android.onAnimationFinished === 'function') {
+            window.Android.onAnimationFinished();
+          }
+        }
+      });
+    });
+  </script></body>
+</html>
