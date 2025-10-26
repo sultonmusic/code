@@ -1,7 +1,0 @@
-﻿from pathlib import Path
-path = Path('index.html')
-text = path.read_text(encoding='utf-8')
-old = "            const bars = document.querySelectorAll('#info-rating .rating-bar-fill');\n            bars.forEach(bar => {\n                // Update data-final to new width and animate from 0 to final\n                bar.dataset.final = `${avgNum * 10}`;\n                bar.style.width = '0%';\n                setTimeout(() => {\n                    bar.style.width = `${avgNum * 10}%`;\n                }, 10);\n            });\n"\nnew = "            const bars = document.querySelectorAll('#info-rating .rating-bar-fill');\n            bars.forEach(bar => {\n                const aspect = bar.dataset.aspect;\n                const final = aspect ? (aspectPercentages[aspect] ?? 0) : Math.round(avgNum * 10);\n                bar.dataset.final = `${final}`;\n                bar.style.width = '0%';\n                setTimeout(() => {\n                    bar.style.width = `${final}%`;\n                }, 10);\n            });\n            const aspectValueEls = document.querySelectorAll('#info-rating [data-aspect-value]');\n            aspectValueEls.forEach(span => {\n                const aspect = span.dataset.aspectValue;\n                if (!aspect) return;\n                span.textContent = `${aspectPercentages[aspect] ?? 0}%`;\n            });\n"\nif old not in text:
-    raise SystemExit('pattern not found for rating bar update')
-text = text.replace(old, new, 1)
-path.write_text(text, encoding='utf-8')
